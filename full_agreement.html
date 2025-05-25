@@ -1,0 +1,106 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Полное пользовательское соглашение — BotFly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { @apply bg-gray-100 font-sans text-gray-800; }
+    .container { @apply max-w-4xl mx-auto py-12 px-4; }
+    h1 { @apply text-4xl font-bold text-center mb-8; }
+    h2 { @apply text-2xl font-semibold text-blue-600 mt-6 mb-4; }
+    p { @apply mb-4 text-lg; }
+    .back-link { @apply text-blue-600 hover:underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Полное пользовательское соглашение сервиса BotFly</h1>
+    
+    <h2>1. Общие положения</h2>
+    <p>Настоящее соглашение (далее — "Соглашение") регулирует порядок предоставления услуг хостинга для Telegram-ботов (далее — "Услуги") сервисом BotFly (далее — "Сервис"). Использование Услуг означает безусловное согласие Пользователя с условиями Соглашения.</p>
+    <p>Сервис предоставляет возможность размещения и запуска программного кода Telegram-ботов за плату в размере 20 рублей в месяц за одного бота.</p>
+
+    <h2>2. Обязанности Пользователя</h2>
+    <p>2.1. Пользователь обязуется предоставить полный и самодостаточный программный код бота, включая файлы зависимостей (например, <code>requirements.txt</code> для Python или <code>package.json</code> для Node.js).</p>
+    <p>2.2. Код не должен содержать вредоносных элементов, включая, но не ограничиваясь, команды для доступа к системным ресурсам, сетевым службам или файлам за пределами выделенной директории.</p>
+    <p>2.3. Пользователь обязуется не использовать Услуги для незаконной деятельности, включая создание ботов, нарушающих правила платформы Telegram.</p>
+
+    <h2>3. Обязанности Сервиса</h2>
+    <p>3.1. Сервис обязуется обеспечить запуск бота и его функционирование в режиме 24/7 при условии стабильной работы серверного оборудования.</p>
+    <p>3.2. По запросу Пользователя, направленному через Telegram-бот <a href="https://t.me/BotFlyHelp_bot" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>, Сервис предоставляет доступ к логам бота (stdout и stderr) в текстовом формате.</p>
+    <p>3.3. Сервис не предоставляет Пользователю доступ к консоли, SSH, системным ресурсам или интерактивному управлению сервером.</p>
+
+    <h2>4. Ограничение ответственности</h2>
+    <p>4.1. Сервис не несет ответственности за некорректное функционирование бота, вызванное ошибками в программном коде, предоставленном Пользователем, а также за любые убытки, прямые или косвенные, связанные с использованием бота.</p>
+    <p>4.2. Сервис не гарантирует работоспособность ботов, зависящих от внешних API, сервисов или ресурсов, не указанных в предоставленном коде.</p>
+    <p>4.3. Пользователь несет полную ответственность за содержание, функциональность и последствия работы своего бота.</p>
+
+    <h2>5. Технические требования к боту</h2>
+    <p>5.1. Программный код бота должен быть самодостаточным, включая все необходимые библиотеки и ресур Cain, указанные в файле зависимостей.</p>
+    <p>5.2. Бот не должен требовать ручной настройки окружения, интерактивного вмешательства или доступа к консоли для запуска и функционирования.</p>
+    <p>5.3. Максимальный объем оперативной памяти, выделяемой для работы бота, составляет 100 МБ. В случае превышения данного лимита Сервис вправе приостановить работу бота или отказать в предоставлении Услуг.</p>
+
+    <h2>6. Порядок оплаты</h2>
+    <p>6.1. Стоимость Услуг составляет 20 рублей в месяц за одного бота. Оплата осуществляется посредством банковского перевода или иными согласованными способами.</p>
+    <p>6.2. В случае отсутствия своевременной оплаты Сервис вправе приостановить предоставление Услуг до момента поступления средств.</p>
+
+    <h2>7. Доступ к логам</h2>
+    <p>7.1. По запросу Пользователя через Telegram-бот <a href="https://t.me/BotFlyHelp_bot" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a> Сервис предоставляет логи бота в текстовом формате.</p>
+    <p>7.2. Доступ к логам ограничивается их предоставлением в текстовом виде. Пользователь не имеет права на доступ к серверу или иным инструментам управления.</p>
+
+    <h2>8. Прекращение предоставления Услуг</h2>
+    <p>8.1. Сервис вправе отказать в предоставлении Услуг или приостановить их в случае нарушения Пользователем условий Соглашения, превышения ботом лимита ресурсов (100 МБ RAM) или наличия в коде вредоносных элементов.</p>
+    <p>8.2. О прекращении предоставления Услуг Пользователь уведомляется через Telegram-бот <a href="https://t.me/BotFlyHelp_bot" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>.</p>
+
+    <h2>9. Изменение условий</h2>
+    <p>9.1. Сервис оставляет за собой право вносить изменения в настоящее Соглашение. Уведомление об изменениях направляется Пользователю через Telegram-бот <a href="https://t.me/BotFlyHelp_bot" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>.</p>
+
+    <h2>10. Заключительные положения</h2>
+    <p>10.1. Настоящее Соглашение вступает в силу с момента начала использования Услуг и действует до прекращения предоставления Услуг.</p>
+    <p>10.2. Все споры, связанные с исполнением Соглашения, разрешаются путем переговоров через Telegram-бот <a href="https://t.me/BotFlyHelp_bot" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>.</p>
+
+    <p class="mt-8"><a href="index.html#agreement" class="back-link">Вернуться к основному соглашению</a></p>
+  </div>
+</body>
+</html>
