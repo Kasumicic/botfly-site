@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -48,16 +9,23 @@
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <style>
+    /* Стили для плавного появления элементов */
     .fade-in { opacity: 0; transition: opacity 0.5s ease-in; }
     .fade-in.aos-animate { opacity: 1; }
+    /* Стили для заголовков секций соглашения */
     .agreement-section { @apply text-blue-600 font-semibold mb-2; }
+    /* Стили для текста соглашения */
     .agreement-text { @apply mb-4; }
+    /* Стили для вопросов FAQ */
+    .faq-question { @apply text-xl font-semibold mb-2 text-blue-600; }
+    /* Стили для ответов FAQ */
+    .faq-answer { @apply mb-4; }
   </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
   <header class="bg-gradient-to-r from-blue-700 to-indigo-600 text-white py-12">
     <div class="container mx-auto text-center" data-aos="fade-up">
-      <img src="logo.svg" alt="BotFly Logo" class="mx-auto mb-4 h-16">
+      <img src="logo.svg" alt="Логотип BotFly" class="mx-auto mb-4 h-16">
       <h1 class="text-5xl font-extrabold tracking-tight">BotFly — Хостинг для твоих Telegram-ботов</h1>
       <p class="text-xl mt-4 font-light max-w-2xl mx-auto">Запусти своего бота за 20 рублей в месяц — 24/7, без сложностей и маминого компа!</p>
       <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="mt-6 inline-block bg-white text-blue-700 py-3 px-8 rounded-full font-semibold hover:bg-blue-100 transition duration-300">Написать в Telegram</a>
@@ -70,6 +38,7 @@
       <button data-tab="about" class="tab-link px-6 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold hover:bg-blue-700 hover:text-white transition duration-200" onclick="showTab('about')">Обо мне</button>
       <button data-tab="contact" class="tab-link px-6 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold hover:bg-blue-700 hover:text-white transition duration-200" onclick="showTab('contact')">Связь</button>
       <button data-tab="agreement" class="tab-link px-6 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold hover:bg-blue-700 hover:text-white transition duration-200" onclick="showTab('agreement')">Соглашение</button>
+      <button data-tab="faq" class="tab-link px-6 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold hover:bg-blue-700 hover:text-white transition duration-200" onclick="showTab('faq')">FAQ</button>
     </div>
   </nav>
 
@@ -164,11 +133,48 @@
         <p class="agreement-text">Хочешь все детали юридическим языком? Ознакомься с <a href="full_agreement.html" class="text-blue-600 hover:underline">Полным пользовательским соглашением</a>.</p>
       </div>
     </section>
+
+    <section id="faq" class="tab-content hidden" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-center mb-8">Часто задаваемые вопросы</h2>
+      <div class="max-w-3xl mx-auto text-lg">
+        <p class="mb-6">Здесь ты найдешь ответы на самые популярные вопросы о хостинге Telegram-ботов BotFly. Если ты не нашел ответ на свой вопрос, напиши нам в Telegram!</p>
+
+        <h3 class="faq-question">1. Что такое BotFly и для кого он предназначен?</h3>
+        <p class="faq-answer">BotFly — это доступный хостинг для Telegram-ботов, который позволяет запустить твоего бота 24/7 всего за 20 рублей в месяц. Он идеально подходит для школьников, студентов и начинающих разработчиков, которые хотят запустить своего бота без сложностей и больших затрат.</p>
+
+        <h3 class="faq-question">2. Сколько стоит хостинг и как оплатить?</h3>
+        <p class="faq-answer">Хостинг стоит всего 20 рублей в месяц за одного бота. Оплата производится путем перевода средств. Подробности оплаты ты можешь узнать, написав нам в telegram: <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>.</p>
+
+        <h3 class="faq-question">3. Какие языки программирования поддерживаются?</h3>
+        <p class="faq-answer">Мы поддерживаем ботов, написанных на популярных языках, таких как Python, Node.js и других. Главное, чтобы код был самодостаточным и содержал файл зависимостей (например, <code>requirements.txt</code> для Python или <code>package.json</code> для Node.js).</p>
+
+        <h3 class="faq-question">4. Как мне загрузить своего бота на BotFly?</h3>
+        <p class="faq-answer">Процесс очень прост! Тебе нужно написать нашему боту в Telegram: <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>. Пришли нам архив с кодом твоего бота и файл с зависимостями. Мы проверим файл на вредоносный код и потребление, после оплаты начнем развертку бота.</p>
+
+        <h3 class="faq-question">5. Могу ли я получить доступ к консоли или SSH?</h3>
+        <p class="faq-answer">Нет, доступ к консоли, SSH или прямому доступу к серверу не предоставляется. Мы берем на себя все технические аспекты запуска и поддержания работы твоего бота. Ты можешь запросить логи бота через нашего Telegram-бота.</p>
+
+        <h3 class="faq-question">6. Что делать, если мой бот перестал работать?</h3>
+        <p class="faq-answer">Если твой бот перестал работать, в первую очередь запроси логи через нашего Telegram-бота <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>. Возможно, проблема в твоем коде или внешних зависимостях. Мы не несем ответственности за ошибки в коде бота, но готовы помочь с диагностикой, предоставив логи. Бывают моменты аварийного технического обслуживания, мы предупредим об этом.</p>
+
+        <h3 class="faq-question">7. Есть ли ограничения по памяти (RAM) для бота?</h3>
+        <p class="faq-answer">Да, каждый бот имеет лимит оперативной памяти в 100 МБ RAM. Если твой бот потребляет больше памяти, мы можем приостановить его работу или отказать в хостинге. Это сделано для обеспечения стабильной работы сервиса для всех пользователей.</p>
+
+        <h3 class="faq-question">8. Что произойдет, если я не оплачу хостинг вовремя?</h3>
+        <p class="faq-answer">Если оплата не поступит вовремя, работа твоего бота будет приостановлена до момента получения оплаты. Мы всегда сообщим тебе об этом через нашего Telegram-бота.</p>
+
+        <h3 class="faq-question">9. Как часто обновляются логи бота?</h3>
+        <p class="faq-answer">Логи бота (stdout и stderr) можно запросить в любое время через нашего Telegram-бота <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="text-blue-600 hover:underline">@BotFlyHelp_bot</a>. Они будут предоставлены в текстовом виде.</p>
+
+        <h3 class="faq-question">10. Могу ли я запустить несколько ботов?</h3>
+        <p class="faq-answer">Да, ты можешь запустить несколько ботов. Каждый бот будет оплачиваться отдельно (20 рублей в месяц за бота).</p>
+      </div>
+    </section>
   </main>
 
   <footer class="bg-gray-900 text-white py-10">
     <div class="container mx-auto text-center" data-aos="fade-up">
-      <img src="logo.svg" alt="BotFly Logo" class="mx-auto mb-4 h-12">
+      <img src="logo.svg" alt="Логотип BotFly" class="mx-auto mb-4 h-12">
       <p class="text-lg">© 2025 BotFly — Хостинг для Telegram-ботов</p>
       <p class="mt-2">Создано с 🚀 для твоих идей!</p>
       <a href="https://t.me/BotFlyHelp_bot" target="_blank" class="mt-4 inline-block text-blue-300 hover:underline">Telegram: @BotFlyHelp_bot</a>
@@ -176,16 +182,40 @@
   </footer>
 
   <script defer>
+    // Функция для отображения вкладки
     function showTab(tabId) {
-      if (!tabId) return;
+      if (!tabId) return; // Если ID вкладки не передан, выходим
+
+      // Скрываем все вкладки
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      // Отображаем активную вкладку
       const activeTab = document.getElementById(tabId);
       if (activeTab) activeTab.classList.remove('hidden');
+
+      // Удаляем активные стили со всех кнопок вкладок
       document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('bg-blue-700', 'text-white', 'hover:bg-blue-800'));
+      // Добавляем активные стили к текущей кнопке вкладки
       const activeLink = document.querySelector(`[data-tab="${tabId}"]`);
       if (activeLink) activeLink.classList.add('bg-blue-700', 'text-white', 'hover:bg-blue-800');
     }
+
+    // Инициализация AOS (Animate On Scroll) библиотеки
     AOS.init({ duration: 800, once: true });
+
+    // Функция для обработки хеша в URL
+    function handleHashChange() {
+      const hash = window.location.hash.substring(1); // Получаем хеш без символа '#'
+      if (hash) {
+        showTab(hash); // Если хеш есть, показываем соответствующую вкладку
+      } else {
+        showTab('home'); // Если хеша нет, показываем вкладку "Главная" по умолчанию
+      }
+    }
+
+    // Вызываем функцию при загрузке страницы
+    window.addEventListener('DOMContentLoaded', handleHashChange);
+    // Вызываем функцию при изменении хеша в URL
+    window.addEventListener('hashchange', handleHashChange);
   </script>
 </body>
 </html>
